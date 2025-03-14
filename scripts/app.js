@@ -1,3 +1,54 @@
+const loadMeals = () => {
+  fetch('http://192.168.1.17:5000/meals')
+    .then(response => response.json())
+    .then(data => {
+      const meals = data.meals;
+
+      const mealsTable = document.getElementById('meals-table');
+
+      // clear table before adding new rows
+      mealsTable.innerHTML = "";
+
+      meals.forEach(meal => {
+        const mealElement = document.createElement('tr');
+
+        const mealDate = new Date(meal.date).toLocaleString('pt-BR');
+
+        const totalCalories = meal.meal_foods.reduce((acc, food) => acc + food.food.calories * food.quantity, 0);
+
+        const deleteMealButton = document.createElement('button');
+        deleteMealButton.type = 'button';
+        deleteMealButton.className = 'btn btn-danger';
+        deleteMealButton.innerText = 'Excluir';
+        deleteMealButton.addEventListener('click', () => handleDeleteMeal(meal.id));
+
+        mealElement.innerHTML = `
+      <td>${meal.title}</td>
+      <td>${totalCalories} kcal</td>
+      <td>${mealDate}</td>
+      <td id="${meal.id}-actions">
+
+        <button type="button" class="btn btn-primary">
+          Editar
+        </button>
+
+      </td>
+      `;
+        mealsTable.appendChild(mealElement);
+
+        const mealActions = document.getElementById(`${meal.id}-actions`);
+        mealActions.appendChild(deleteMealButton);
+      });
+
+    });
+}
+
+const handleDeleteMeal = (mealId) => {
+  fetch(`http://192.168.1.17:5000/meals/${mealId}`, {
+    method: 'DELETE'
+  }).finally(() => loadMeals());
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.querySelectorAll("#nav-links .nav-link");
 
@@ -43,4 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
   });
+
+  loadMeals();
+
 });

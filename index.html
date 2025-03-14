@@ -144,7 +144,7 @@
       <div class="b-example-divider b-example-vr"></div>
 
       <div id="content">
-        <div id="welcome" class="px-4 py-5 my-5 text-center">
+        <div id="welcome" class="content-item px-4 py-5 text-center">
           <img
             class="d-block mx-auto mb-4"
             src="./imgs/logo.png"
@@ -164,30 +164,27 @@
               saúde. Entenda em detalhes a composição nutricional dos alimentos
               que você consome e faça escolhas mais conscientes.
             </p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-              <button type="button" class="btn btn-primary btn-lg px-4 gap-3">
-                Começar
-              </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary btn-lg px-4"
-              >
-                Saiba mais
-              </button>
-            </div>
           </div>
         </div>
 
-        <div id="dashboard" class="hidden">
-          <h1>
-            <span class="badge bg-primary"> Dashboard </span>
-          </h1>
+        <div id="dashboard" class="content-item">
+          <h1>Dashboard</h1>
         </div>
 
-        <div id="diet" class="hidden">
-          <h1>
-            <span class="badge bg-primary">Minha Dieta</span>
-          </h1>
+        <div id="diet" class="content-item">
+          <h1>Minha Dieta</h1>
+
+          <table class="table" id="meals-table">
+            <thead>
+              <tr>
+                <th scope="col">Titulo</th>
+                <th scope="col">Calorias</th>
+                <th scope="col">Data</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </main>
