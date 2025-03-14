@@ -64,6 +64,8 @@ main {
   overflow-y: auto;
 }
 
+/* ---------------- */
+
 .b-example-divider {
   width: 100%;
   height: 3rem;
