@@ -1,6 +1,15 @@
+.roboto-mono {
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
 }
 
 html,
