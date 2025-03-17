@@ -10,6 +10,9 @@ body {
 
   width: 100dvw;
   height: 100dvh;
+
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #content {
@@ -34,7 +37,7 @@ body {
   height: 100%;
 }
 
-.table {
+table {
   display: table;
   width: 100%;
 }
