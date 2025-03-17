@@ -192,7 +192,9 @@ const renderMeals = (meals) => {
   // clear table before adding new rows
   mealsTable.innerHTML = '';
 
-  meals.forEach(meal => {
+  const sortedMeals = meals.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  sortedMeals.forEach(meal => {
     const mealElement = document.createElement('tr');
 
     const mealDate = new Date(meal.date).toLocaleString('pt-BR');
