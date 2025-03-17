@@ -1,5 +1,3 @@
-
-
 const addFoodToSelectedTable = (foodId) => {
 
   const foods = JSON.parse(localStorage.getItem('foods')) || [];
@@ -37,14 +35,38 @@ const addFoodToSelectedTable = (foodId) => {
 
 }
 
-const submitNewMeal = (e) => {
-  // todo: implement this function
+const submitNewMeal = async (e) => {
 
-  e.preventDefault();
+  try {
+    e.preventDefault();
 
-  const formData = new FormData(e.target);
+    const formData = new FormData(e.target);
 
-  console.log(Object.fromEntries(formData.entries()));
+    const formattedDate = new Date().toISOString();
+
+    const requestBody = {
+      title: formData.get('title'),
+      date: formattedDate,
+      foods: [],
+    };
+
+    await fetch('http://localhost:5000/meals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    await loadMeals();
+
+    e.target.reset();
+
+  } catch (error) {
+    console.log('error', error)
+  }
+
+
 }
 
 const setupForm = () => {
@@ -141,7 +163,6 @@ const initAutocomplete = () => {
 
 
 }
-
 
 const loadFoods = () => {
   const localFoods = localStorage.getItem('foods');
