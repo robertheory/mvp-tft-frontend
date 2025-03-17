@@ -1,4 +1,4 @@
-let foodList = [];
+
 
 const addFoodToSelectedTable = (foodId) => {
 
@@ -37,6 +37,50 @@ const addFoodToSelectedTable = (foodId) => {
 
 }
 
+const submitNewMeal = (e) => {
+  // todo: implement this function
+
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+
+  console.log(Object.fromEntries(formData.entries()));
+}
+
+const setupForm = () => {
+  // const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+
+  const newMealForm = document.getElementById('new-meal-form');
+
+  const localFormData = localStorage.getItem('tft:new-meal-form');
+
+  const formData = new FormData(newMealForm);
+
+  if (localFormData) {
+
+    const parsedFormData = JSON.parse(localFormData);
+
+    for (const key in parsedFormData) {
+      formData.append(key, parsedFormData[key]);
+    }
+
+  } else {
+    localStorage.setItem('tft:new-meal-form', JSON.stringify(Object.fromEntries(formData.entries())));
+  }
+
+  newMealForm.addEventListener('submit', submitNewMeal);
+
+  newMealForm.addEventListener('input', (e) => {
+    const formData = new FormData(newMealForm);
+    localStorage.setItem('tft:new-meal-form', JSON.stringify(Object.fromEntries(formData.entries())));
+  });
+
+  newMealForm.addEventListener('reset', () => {
+    localStorage.removeItem('tft:new-meal-form');
+  });
+
+}
+
 const createFoodOption = (food) => {
 
   const foodOption = document.createElement('option');
@@ -50,10 +94,11 @@ const createFoodOption = (food) => {
 
 }
 
+const initAutocomplete = () => {
+  const autocompleteInput = document.getElementById('autocomplete-input')
 
-const autocompleteInput = document.getElementById('autocomplete-input')
+  if (!autocompleteInput) return;
 
-if (autocompleteInput) {
   autocompleteInput.addEventListener('input', function () {
     const input = this.value.toLowerCase();
     const results = document.getElementById('autocomplete-results');
@@ -93,12 +138,10 @@ if (autocompleteInput) {
 
 
   });
+
+
 }
 
-
-let selectedFoods = [];
-
-const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
 
 const loadFoods = () => {
   const localFoods = localStorage.getItem('foods');
@@ -116,45 +159,8 @@ const loadFoods = () => {
 
   }
 
-  foodList = JSON.parse(localStorage.getItem('foods'));
+  JSON.parse(localStorage.getItem('foods'));
 
-  // foods.forEach(food => {
-  //   const foodOption = document.createElement('option');
-
-  //   const foodLabel = `${food.name} (${food.unit}) - ${food.calories} kcal`;
-
-  //   foodOption.value = food.id;
-  //   foodOption.innerText = foodLabel;
-
-  //   foodOption.addEventListener('select', () => {
-  //     const selectedFoodElement = document.createElement('tr');
-
-  //     // add a hidden input with the food id
-  //     const foodIdInput = document.createElement('input');
-  //     foodIdInput.type = 'hidden';
-  //     foodIdInput.name = 'foods[]';
-  //     foodIdInput.value = food.id;
-
-  //     selectedFoodElement.innerHTML = `
-  //       <td>${food.name}</td>
-  //       <td>${food.unit}</td>
-  //       <td>${food.calories} kcal</td>
-  //       <td>
-  //         <input type="number" name="quantities[]" class="form-control" min="1" required>
-  //       </td>
-  //       <td>
-  //         <button type="button" class="btn btn-danger">
-  //           Excluir
-  //         </button>
-  //       </td>
-  //     `;
-  //     selectedFoodsTableBody.appendChild(selectedFoodElement);
-  //     selectedFoodElement.appendChild(foodIdInput);
-
-
-  //   });
-
-  // });
 }
 
 const renderMeals = (meals) => {
@@ -227,5 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadMeals();
 
   loadFoods();
+
+  initAutocomplete();
+
+  setupForm();
 
 });
