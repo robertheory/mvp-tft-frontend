@@ -1,14 +1,23 @@
-const addFoodToSelectedTable = (foodId) => {
+const handleDeleteSelectedFood = (foodId) => {
+  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
 
+  if (!selectedFoodsTableBody) return;
+
+  selectedFoodsTableBody.removeChild(selectedFoodsTableBody.querySelector(`tr[data-food-id="${foodId}"]`));
+}
+
+const addFoodToSelectedTable = (foodId) => {
   const foods = JSON.parse(localStorage.getItem('foods')) || [];
 
   const food = foods.find(food => food.id === foodId);
+  console.log('food', food)
 
   if (!food) {
     return;
   }
 
   const selectedFoodElement = document.createElement('tr');
+  selectedFoodElement.setAttribute('data-food-id', food.id);
 
   // add a hidden input with the food id
   const foodIdInput = document.createElement('input');
@@ -16,22 +25,38 @@ const addFoodToSelectedTable = (foodId) => {
   foodIdInput.name = 'foods[]';
   foodIdInput.value = food.id;
 
+  selectedFoodElement.appendChild(foodIdInput);
+
+  const deleteFoodButton = document.createElement('button');
+  deleteFoodButton.type = 'button';
+  deleteFoodButton.className = 'btn btn-danger';
+  deleteFoodButton.addEventListener('click', () => handleDeleteSelectedFood(food.id));
+
+  const deleteIcon = document.createElement('i');
+  deleteIcon.className = 'bi bi-x';
+
+  deleteFoodButton.appendChild(deleteIcon);
+
+  const deleteFoodButtonCell = document.createElement('td');
+  deleteFoodButtonCell.appendChild(deleteFoodButton);
+
   selectedFoodElement.innerHTML = `
-    <td>${food.name}</td>
-    <td>${food.unit}</td>
+    <td>${food.name} (${food.unit})</td>
     <td>${food.calories} kcal</td>
     <td>
       <input type="number" name="quantities[]" class="form-control" min="1" required>
     </td>
-    <td>
-      <button type="button" class="btn btn-danger">
-        Excluir
-      </button>
-    </td>
   `;
 
+  deleteFoodButtonCell.appendChild(deleteFoodButton);
+
+  selectedFoodElement.appendChild(deleteFoodButtonCell);
+
+  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+
+  if (!selectedFoodsTableBody) return;
+
   selectedFoodsTableBody.appendChild(selectedFoodElement);
-  selectedFoodElement.appendChild(foodIdInput);
 
 }
 
@@ -118,8 +143,22 @@ const createFoodOption = (food) => {
 
 const initAutocomplete = () => {
   const autocompleteInput = document.getElementById('autocomplete-input')
+  const addFoodButton = document.getElementById('add-food-button')
 
   if (!autocompleteInput) return;
+
+  if (addFoodButton) {
+    addFoodButton.addEventListener('click', () => {
+      const results = document.getElementById('autocomplete-results');
+      const selectedOption = results.options[results.selectedIndex];
+
+      if (selectedOption && selectedOption.value) {
+        addFoodToSelectedTable(selectedOption.value);
+        autocompleteInput.value = '';
+        results.classList.add('d-none');
+      }
+    });
+  }
 
   autocompleteInput.addEventListener('input', function () {
     const input = this.value.toLowerCase();
