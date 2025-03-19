@@ -339,25 +339,43 @@ const renderMeals = (meals) => {
     const deleteMealButton = document.createElement('button');
     deleteMealButton.type = 'button';
     deleteMealButton.className = 'btn btn-danger';
-    deleteMealButton.innerText = 'Excluir';
     deleteMealButton.addEventListener('click', () => handleDeleteMeal(meal.id));
+
+    const deleteMealIcon = document.createElement('i');
+    deleteMealIcon.className = 'bi bi-trash';
+    deleteMealButton.appendChild(deleteMealIcon);
+
+    const editMealButton = document.createElement('button');
+    editMealButton.type = 'button';
+    editMealButton.className = 'btn btn-primary';
+
+    const editMealIcon = document.createElement('i');
+    editMealIcon.className = 'bi bi-pencil';
+    editMealButton.appendChild(editMealIcon);
+
+    const actionsCell = document.createElement('td');
+    actionsCell.setAttribute('id', `${meal.id}-actions`);
+
+    actionsCell.appendChild(editMealButton);
+    actionsCell.appendChild(deleteMealButton);
+
+    // styles must be display flex row align-items: center justify-content: center gap 1rem
+    actionsCell.style.display = 'flex';
+    actionsCell.style.justifyContent = 'center';
+    actionsCell.style.alignItems = 'center';
+    actionsCell.style.gap = '1rem';
+    actionsCell.style.width = '100px';
 
     mealElement.innerHTML = `
       <td>${meal.title}</td>
       <td>${totalCalories} kcal</td>
       <td>${mealDate}</td>
-      <td id="${meal.id}-actions">
+    `;
 
-        <button type="button" class="btn btn-primary">
-          Editar
-        </button>
+    mealElement.appendChild(actionsCell);
 
-      </td>
-      `;
     mealsTable.appendChild(mealElement);
 
-    const mealActions = document.getElementById(`${meal.id}-actions`);
-    mealActions.appendChild(deleteMealButton);
   });
 }
 
