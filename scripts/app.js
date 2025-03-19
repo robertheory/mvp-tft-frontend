@@ -46,8 +46,15 @@ const saveFormData = () => {
 const addFoodToSelectedTable = (foodId) => {
   const foods = JSON.parse(localStorage.getItem('foods')) || [];
   const foodsDataContainer = document.getElementById('foods-data-container');
+  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
 
-  if (!foodsDataContainer) return;
+  if (!foodsDataContainer || !selectedFoodsTableBody) return;
+
+  // Check if food is already in the table
+  const existingFood = selectedFoodsTableBody.querySelector(`tr[data-food-id="${foodId}"]`);
+  if (existingFood) {
+    return; // Food already exists, do nothing
+  }
 
   const food = foods.find(food => food.id === foodId);
 
@@ -87,11 +94,6 @@ const addFoodToSelectedTable = (foodId) => {
   `;
 
   selectedFoodElement.appendChild(deleteFoodButtonCell);
-
-  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
-
-  if (!selectedFoodsTableBody) return;
-
   selectedFoodsTableBody.appendChild(selectedFoodElement);
 
   // Save form data after adding food
