@@ -378,12 +378,11 @@ const createFoodOption = (food) => {
 }
 
 const initAutocomplete = (foods) => {
-  const autocompleteInput = document.getElementById('autocomplete-input')
-  const addFoodButton = document.getElementById('add-food-button')
+  // Initialize autocomplete for new meal form
+  const autocompleteInput = document.getElementById('autocomplete-input');
+  const addFoodButton = document.getElementById('add-food-button');
 
-  if (!autocompleteInput) return;
-
-  if (addFoodButton) {
+  if (autocompleteInput && addFoodButton) {
     addFoodButton.addEventListener('click', () => {
       const results = document.getElementById('autocomplete-results');
       const selectedOption = results.options[results.selectedIndex];
@@ -394,36 +393,57 @@ const initAutocomplete = (foods) => {
         results.classList.add('d-none');
       }
     });
+
+    autocompleteInput.addEventListener('input', function () {
+      handleAutocompleteInput(this, foods, false);
+    });
   }
 
-  autocompleteInput.addEventListener('input', function () {
-    const input = this.value.toLowerCase();
-    const results = document.getElementById('autocomplete-results');
+  // Initialize autocomplete for edit meal form
+  const editAutocompleteInput = document.getElementById('edit-autocomplete-input');
+  const editAddFoodButton = document.getElementById('edit-add-food-button');
 
-    if (input.length > 0) {
-      const filteredFoods = foods.filter(food => food.name.toLowerCase().includes(input));
+  if (editAutocompleteInput && editAddFoodButton) {
+    editAddFoodButton.addEventListener('click', () => {
+      const results = document.getElementById('edit-autocomplete-results');
+      const selectedOption = results.options[results.selectedIndex];
 
-      if (filteredFoods.length > 0) {
-
-        results.innerHTML = '';
-
-        filteredFoods.forEach(food => {
-          const foodOption = createFoodOption(food);
-          results.appendChild(foodOption);
-        });
-
-        results.classList.remove('d-none');
-      } else {
-        results.innerHTML = '<option>Nenhum alimento encontrado</option>';
-        results.classList.remove('d-none');
+      if (selectedOption && selectedOption.value) {
+        addFoodToSelectedTable(selectedOption.value, true);
+        editAutocompleteInput.value = '';
+        results.classList.add('d-none');
       }
+    });
+
+    editAutocompleteInput.addEventListener('input', function () {
+      handleAutocompleteInput(this, foods, true);
+    });
+  }
+};
+
+const handleAutocompleteInput = (input, foods, isEdit) => {
+  const inputValue = input.value.toLowerCase();
+  const resultsId = isEdit ? 'edit-autocomplete-results' : 'autocomplete-results';
+  const results = document.getElementById(resultsId);
+
+  if (inputValue.length > 0) {
+    const filteredFoods = foods.filter(food => food.name.toLowerCase().includes(inputValue));
+
+    if (filteredFoods.length > 0) {
+      results.innerHTML = '';
+      filteredFoods.forEach(food => {
+        const foodOption = createFoodOption(food);
+        results.appendChild(foodOption);
+      });
+      results.classList.remove('d-none');
     } else {
-      results.classList.add('d-none');
+      results.innerHTML = '<option>Nenhum alimento encontrado</option>';
+      results.classList.remove('d-none');
     }
-  });
-
-
-}
+  } else {
+    results.classList.add('d-none');
+  }
+};
 
 const loadFoods = async () => {
   const localFoods = localStorage.getItem('foods');
@@ -432,7 +452,7 @@ const loadFoods = async () => {
 
     const response = await fetch('http://192.168.1.17:5000/foods')
 
-    const { foods } = await response.json();
+    const foods = await response.json();
 
     localStorage.setItem('foods', JSON.stringify(foods));
 
@@ -512,7 +532,7 @@ const loadMeals = async () => {
 
     const response = await fetch('http://192.168.1.17:5000/meals')
 
-    const { meals } = await response.json();
+    const meals = await response.json();
 
     renderMeals(meals);
 
@@ -567,7 +587,7 @@ const loadGoals = async () => {
 
 const loadCurrentPersonalInfo = async () => {
   try {
-    const response = await fetch('http://192.168.1.17:5000/personal-info/current');
+    const response = await fetch('http://192.168.1.17:5000/personal-info');
     if (!response.ok) {
       return null;
     }
