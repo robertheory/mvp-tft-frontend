@@ -404,10 +404,132 @@ const handleDeleteMeal = (mealId) => {
   }).finally(() => loadMeals());
 };
 
+const loadActivityLevels = async () => {
+  try {
+    const response = await fetch('http://192.168.1.17:5000/activity-levels');
+    const data = await response.json();
+    return data || [];
+  } catch (error) {
+    console.error('Error loading activity levels:', error);
+    return [];
+  }
+};
+
+const loadGoals = async () => {
+  try {
+    const response = await fetch('http://192.168.1.17:5000/goals');
+    const data = await response.json();
+    return data || [];
+  } catch (error) {
+    console.error('Error loading goals:', error);
+    return [];
+  }
+};
+
+const loadCurrentPersonalInfo = async () => {
+  try {
+    const response = await fetch('http://192.168.1.17:5000/personal-info/current');
+    if (!response.ok) {
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error loading current personal info:', error);
+    return null;
+  }
+};
+
+const populateActivityLevels = async () => {
+  const select = document.getElementById('activity_level_id');
+  if (!select) return;
+
+  const activityLevels = await loadActivityLevels();
+
+  activityLevels.forEach((level) => {
+    const option = document.createElement('option');
+    option.value = level.id;
+    option.textContent = `${level.name} - ${level.description}`;
+    select.appendChild(option);
+  });
+};
+
+const populateGoals = async () => {
+  const select = document.getElementById('goal_id');
+  if (!select) return;
+
+  const goals = await loadGoals();
+
+  goals.forEach((goal) => {
+    const option = document.createElement('option');
+    option.value = goal.id;
+    option.textContent = goal.name;
+    select.appendChild(option);
+  });
+};
+
+const setupPersonalInfoForm = async () => {
+  const form = document.getElementById('personal-info-form');
+  if (!form) return;
+
+  // Load and populate activity levels and goals
+  await Promise.all([
+    populateActivityLevels(),
+    populateGoals()
+  ]);
+
+  // Load current personal info
+  const currentInfo = await loadCurrentPersonalInfo();
+  if (currentInfo) {
+    form.elements['age'].value = currentInfo.age;
+    form.elements['gender'].value = currentInfo.gender;
+    form.elements['weight'].value = currentInfo.weight;
+    form.elements['height'].value = currentInfo.height;
+    form.elements['activity_level_id'].value = currentInfo.activity_level_id;
+    form.elements['goal_id'].value = currentInfo.goal_id;
+  }
+
+  // Handle form submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const data = {
+      age: parseInt(formData.get('age')),
+      gender: formData.get('gender'),
+      weight: parseFloat(formData.get('weight')),
+      height: parseInt(formData.get('height')),
+      activity_level_id: parseInt(formData.get('activity_level_id')),
+      goal_id: parseInt(formData.get('goal_id'))
+    };
+
+    try {
+      const response = await fetch('http://192.168.1.17:5000/personal-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert('Informações pessoais atualizadas com sucesso!');
+      } else {
+        alert('Erro ao atualizar informações pessoais. Por favor, tente novamente.');
+      }
+    } catch (error) {
+      console.error('Error submitting personal info:', error);
+      alert('Erro ao atualizar informações pessoais. Por favor, tente novamente.');
+    }
+  });
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   const foods = await loadFoods();
 
-  loadMeals();
+  await Promise.all([
+    loadMeals(),
+    setupPersonalInfoForm()
+  ]);
 
   initAutocomplete(foods);
 

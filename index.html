@@ -80,6 +80,85 @@
         <p class="lead">Seja mais FIT agora mesmo!</p>
       </div>
 
+      <!-- PERSONAL INFO FORM -->
+      <div class="row mb-5">
+        <div class="col-lg-6">
+          <h3>Informações Pessoais</h3>
+          <form id="personal-info-form">
+            <div class="mb-3">
+              <label for="age" class="form-label">Idade</label>
+              <input
+                type="number"
+                class="form-control"
+                id="age"
+                name="age"
+                required
+                min="0"
+                max="120"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="gender" class="form-label">Sexo Biológico</label>
+              <select class="form-select" id="gender" name="gender" required>
+                <option value="">Selecione...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="weight" class="form-label">Peso (kg)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="weight"
+                name="weight"
+                required
+                min="0"
+                step="0.1"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="height" class="form-label">Altura (cm)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="height"
+                name="height"
+                required
+                min="0"
+                step="1"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="activity_level_id" class="form-label"
+                >Nível de Atividade Física</label
+              >
+              <select
+                class="form-select"
+                id="activity_level_id"
+                name="activity_level_id"
+                required
+              >
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="goal_id" class="form-label">Objetivo</label>
+              <select class="form-select" id="goal_id" name="goal_id" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </form>
+        </div>
+      </div>
+
       <div class="row gx-4 gy-4">
         <div class="col col-lg-5">
           <h3>Nova Refeição</h3>
