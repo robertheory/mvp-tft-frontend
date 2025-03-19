@@ -255,7 +255,7 @@ const renderMeals = (meals) => {
 
     const mealDate = new Date(meal.date).toLocaleString('pt-BR');
 
-    const totalCalories = meal.meal_foods.reduce((acc, food) => acc + food.food.calories * food.quantity, 0);
+    const totalCalories = meal.foods.reduce((acc, food) => acc + food.calories * food.quantity, 0);
 
     const deleteMealButton = document.createElement('button');
     deleteMealButton.type = 'button';
