@@ -348,6 +348,132 @@
         </div>
       </div>
 
+      <!-- Edit Meal Modal -->
+      <div
+        class="modal fade"
+        id="editMealModal"
+        tabindex="-1"
+        aria-labelledby="editMealModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editMealModalLabel">
+                Editar Refeição
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-meal-form" method="post">
+                <input type="hidden" id="edit-meal-id" name="id" />
+                <div class="mb-4">
+                  <label for="edit-title" class="form-label">Titulo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="edit-title"
+                    name="title"
+                    aria-describedby="editTitleHelp"
+                  />
+                  <div id="editTitleHelp" class="form-text">
+                    Insira um titulo para a sua refeição.
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="edit-date" class="form-label">Data</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="edit-date"
+                    name="date"
+                    aria-describedby="editDateHelp"
+                  />
+                  <div id="editDateHelp" class="form-text">
+                    Insira a data da sua refeição.
+                  </div>
+                </div>
+
+                <div class="autocomplete">
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="edit-autocomplete-input"
+                      placeholder="Pesquisar alimento"
+                      aria-label="Pesquisar alimento"
+                    />
+                  </div>
+
+                  <select
+                    class="form-select d-none mb-2"
+                    aria-label="Resultados da pesquisa"
+                    id="edit-autocomplete-results"
+                  >
+                    <option selected>Selecione um alimento</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-primary mb-4"
+                  id="edit-add-food-button"
+                >
+                  <i class="bi bi-plus-lg"></i> Adicionar alimento selecionado
+                </button>
+
+                <table class="table selected-foods-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Alimento</th>
+                      <th scope="col">Calorias</th>
+                      <th scope="col">Quantidade</th>
+                      <th scope="col">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="edit-selected-foods-table-body">
+                    <!-- Food items will be dynamically added here -->
+                  </tbody>
+                </table>
+
+                <div id="edit-foods-data-container">
+                  <!-- Hidden container for food data -->
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Fechar
+              </button>
+              <button
+                type="submit"
+                form="edit-meal-form"
+                class="btn btn-primary"
+              >
+                Salvar
+              </button>
+              <button
+                type="reset"
+                form="edit-meal-form"
+                class="btn btn-secondary"
+              >
+                Limpar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row gx-4 gy-4">
         <div class="col col-lg-12">
           <h3>Refeições</h3>

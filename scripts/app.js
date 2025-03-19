@@ -1,6 +1,9 @@
-const handleDeleteSelectedFood = (foodId) => {
-  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
-  const foodsDataContainer = document.getElementById('foods-data-container');
+const handleDeleteSelectedFood = (foodId, isEdit = false) => {
+  const tableBodyId = isEdit ? 'edit-selected-foods-table-body' : 'selected-foods-table-body';
+  const containerId = isEdit ? 'edit-foods-data-container' : 'foods-data-container';
+
+  const selectedFoodsTableBody = document.getElementById(tableBodyId);
+  const foodsDataContainer = document.getElementById(containerId);
 
   if (!selectedFoodsTableBody || !foodsDataContainer) return;
 
@@ -14,7 +17,9 @@ const handleDeleteSelectedFood = (foodId) => {
   }
 
   // Save form data after removing food
-  saveFormData();
+  if (!isEdit) {
+    saveFormData();
+  }
 }
 
 const saveFormData = () => {
@@ -43,10 +48,13 @@ const saveFormData = () => {
   localStorage.setItem('tft:new-meal-form', JSON.stringify(data));
 }
 
-const addFoodToSelectedTable = (foodId) => {
+const addFoodToSelectedTable = (foodId, isEdit = false) => {
   const foods = JSON.parse(localStorage.getItem('foods')) || [];
-  const foodsDataContainer = document.getElementById('foods-data-container');
-  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+  const containerId = isEdit ? 'edit-foods-data-container' : 'foods-data-container';
+  const tableBodyId = isEdit ? 'edit-selected-foods-table-body' : 'selected-foods-table-body';
+
+  const foodsDataContainer = document.getElementById(containerId);
+  const selectedFoodsTableBody = document.getElementById(tableBodyId);
 
   if (!foodsDataContainer || !selectedFoodsTableBody) return;
 
@@ -75,7 +83,7 @@ const addFoodToSelectedTable = (foodId) => {
   const deleteFoodButton = document.createElement('button');
   deleteFoodButton.type = 'button';
   deleteFoodButton.className = 'btn btn-danger';
-  deleteFoodButton.addEventListener('click', () => handleDeleteSelectedFood(food.id));
+  deleteFoodButton.addEventListener('click', () => handleDeleteSelectedFood(food.id, isEdit));
 
   const deleteIcon = document.createElement('i');
   deleteIcon.className = 'bi bi-x';
@@ -97,16 +105,18 @@ const addFoodToSelectedTable = (foodId) => {
   selectedFoodsTableBody.appendChild(selectedFoodElement);
 
   // Save form data after adding food
-  saveFormData();
+  if (!isEdit) {
+    saveFormData();
+  }
 }
 
-const getSelectedFoods = () => {
-  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+const getSelectedFoods = (isEdit = false) => {
+  const tableBodyId = isEdit ? 'edit-selected-foods-table-body' : 'selected-foods-table-body';
+  const selectedFoodsTableBody = document.getElementById(tableBodyId);
 
   if (!selectedFoodsTableBody) return [];
 
   const foods = [];
-
   const rows = selectedFoodsTableBody.querySelectorAll('tr');
 
   rows.forEach(row => {
@@ -118,6 +128,90 @@ const getSelectedFoods = () => {
 
   return foods;
 }
+
+const populateEditForm = (meal) => {
+  const form = document.getElementById('edit-meal-form');
+  if (!form) return;
+
+  // Set basic form fields
+  form.elements['id'].value = meal.id;
+  form.elements['title'].value = meal.title;
+  form.elements['date'].value = new Date(meal.date).toISOString().slice(0, 16);
+
+  // Clear existing foods
+  const selectedFoodsTableBody = document.getElementById('edit-selected-foods-table-body');
+  const foodsDataContainer = document.getElementById('edit-foods-data-container');
+
+  if (selectedFoodsTableBody && foodsDataContainer) {
+    selectedFoodsTableBody.innerHTML = '';
+    foodsDataContainer.innerHTML = '';
+
+    // Add each food from the meal
+    meal.foods.forEach(food => {
+      addFoodToSelectedTable(food.id, true);
+      const row = selectedFoodsTableBody.querySelector(`tr[data-food-id="${food.id}"]`);
+      if (row) {
+        const quantityInput = row.querySelector(`input[name="quantity[${food.id}]"]`);
+        if (quantityInput) {
+          quantityInput.value = food.quantity;
+        }
+      }
+    });
+  }
+}
+
+const handleEditMeal = async (mealId) => {
+  try {
+    const response = await fetch(`http://192.168.1.17:5000/meals/${mealId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch meal');
+    }
+    const meal = await response.json();
+    populateEditForm(meal);
+    editMealModal.show();
+  } catch (error) {
+    console.error('Error fetching meal:', error);
+    showToast('Erro ao carregar refeição. Por favor, tente novamente.', 'danger');
+  }
+};
+
+const submitEditMeal = async (e) => {
+  try {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const mealId = formData.get('id');
+    const formattedDate = new Date(formData.get('date')).toISOString();
+
+    // Get all food IDs and their quantities
+    const foods = getSelectedFoods(true);
+
+    const requestBody = {
+      title: formData.get('title'),
+      date: formattedDate,
+      foods,
+    };
+
+    const response = await fetch(`http://192.168.1.17:5000/meals/${mealId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (response.ok) {
+      showToast('Refeição atualizada com sucesso!', 'success');
+      await loadMeals();
+      editMealModal.hide();
+    } else {
+      showToast('Erro ao atualizar refeição. Por favor, tente novamente.', 'danger');
+    }
+  } catch (error) {
+    console.error('Error updating meal:', error);
+    showToast('Erro ao atualizar refeição. Por favor, tente novamente.', 'danger');
+  }
+};
 
 const submitNewMeal = async (e) => {
   try {
@@ -353,6 +447,7 @@ const renderMeals = (meals) => {
     const editMealButton = document.createElement('button');
     editMealButton.type = 'button';
     editMealButton.className = 'btn btn-primary';
+    editMealButton.addEventListener('click', () => handleEditMeal(meal.id));
 
     const editMealIcon = document.createElement('i');
     editMealIcon.className = 'bi bi-pencil';
@@ -558,12 +653,14 @@ const setupPersonalInfoForm = async () => {
 // Modal instances
 let profileModal;
 let mealModal;
+let editMealModal;
 let toast;
 
 const setupModals = () => {
   // Get modal instances
   profileModal = new bootstrap.Modal(document.getElementById("profileModal"));
   mealModal = new bootstrap.Modal(document.getElementById("mealModal"));
+  editMealModal = new bootstrap.Modal(document.getElementById("editMealModal"));
 
   // Handle personal info form submission
   const personalInfoForm = document.getElementById("personal-info-form");
@@ -583,6 +680,12 @@ const setupModals = () => {
       // The form submission logic is already handled in submitNewMeal
       mealModal.hide();
     });
+  }
+
+  // Handle edit meal form submission
+  const editMealForm = document.getElementById("edit-meal-form");
+  if (editMealForm) {
+    editMealForm.addEventListener("submit", submitEditMeal);
   }
 };
 
