@@ -135,7 +135,7 @@ const submitNewMeal = async (e) => {
       foods,
     };
 
-    await fetch('http://localhost:5000/meals', {
+    const response = await fetch('http://localhost:5000/meals', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -143,13 +143,18 @@ const submitNewMeal = async (e) => {
       body: JSON.stringify(requestBody),
     });
 
-    await loadMeals();
-    e.target.reset();
-
+    if (response.ok) {
+      showToast('Refeição criada com sucesso!', 'success');
+      await loadMeals();
+      e.target.reset();
+    } else {
+      showToast('Erro ao criar refeição. Por favor, tente novamente.', 'danger');
+    }
   } catch (error) {
-    console.log('error', error)
+    console.log('error', error);
+    showToast('Erro ao criar refeição. Por favor, tente novamente.', 'danger');
   }
-}
+};
 
 const setupForm = () => {
   const newMealForm = document.getElementById('new-meal-form');
@@ -398,10 +403,22 @@ const loadMeals = async () => {
 
 }
 
-const handleDeleteMeal = (mealId) => {
-  fetch(`http://192.168.1.17:5000/meals/${mealId}`, {
-    method: 'DELETE'
-  }).finally(() => loadMeals());
+const handleDeleteMeal = async (mealId) => {
+  try {
+    const response = await fetch(`http://192.168.1.17:5000/meals/${mealId}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      showToast('Refeição excluída com sucesso!', 'success');
+      await loadMeals();
+    } else {
+      showToast('Erro ao excluir refeição. Por favor, tente novamente.', 'danger');
+    }
+  } catch (error) {
+    console.error('Error deleting meal:', error);
+    showToast('Erro ao excluir refeição. Por favor, tente novamente.', 'danger');
+  }
 };
 
 const loadActivityLevels = async () => {
@@ -467,6 +484,21 @@ const populateGoals = async () => {
   });
 };
 
+const showToast = (message, type = 'success') => {
+  const toastElement = document.getElementById('toast');
+  const toastBody = toastElement.querySelector('.toast-body');
+
+  // Set toast background color based on type
+  toastElement.className = `toast bg-${type}`;
+
+  // Set message
+  toastBody.textContent = message;
+
+  // Show toast
+  toast = new bootstrap.Toast(toastElement);
+  toast.show();
+};
+
 const setupPersonalInfoForm = async () => {
   const form = document.getElementById('personal-info-form');
   if (!form) return;
@@ -512,13 +544,13 @@ const setupPersonalInfoForm = async () => {
       });
 
       if (response.ok) {
-        alert('Informações pessoais atualizadas com sucesso!');
+        showToast('Informações pessoais atualizadas com sucesso!', 'success');
       } else {
-        alert('Erro ao atualizar informações pessoais. Por favor, tente novamente.');
+        showToast('Erro ao atualizar informações pessoais. Por favor, tente novamente.', 'danger');
       }
     } catch (error) {
       console.error('Error submitting personal info:', error);
-      alert('Erro ao atualizar informações pessoais. Por favor, tente novamente.');
+      showToast('Erro ao atualizar informações pessoais. Por favor, tente novamente.', 'danger');
     }
   });
 };
@@ -526,6 +558,7 @@ const setupPersonalInfoForm = async () => {
 // Modal instances
 let profileModal;
 let mealModal;
+let toast;
 
 const setupModals = () => {
   // Get modal instances
