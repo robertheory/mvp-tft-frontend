@@ -74,177 +74,282 @@
       </symbol>
     </svg>
 
-    <main class="container-fluid">
+    <main class="container">
       <div class="col text-center">
         <h1 class="display-1">Total Fitness Tracker</h1>
         <p class="lead">Seja mais FIT agora mesmo!</p>
       </div>
 
-      <!-- PERSONAL INFO FORM -->
+      <!-- Modal Trigger Buttons -->
       <div class="row mb-5">
-        <div class="col-lg-6">
-          <h3>Informações Pessoais</h3>
-          <form id="personal-info-form">
-            <div class="mb-3">
-              <label for="age" class="form-label">Idade</label>
-              <input
-                type="number"
-                class="form-control"
-                id="age"
-                name="age"
-                required
-                min="0"
-                max="120"
-              />
-            </div>
+        <div class="col-12 text-center">
+          <button
+            type="button"
+            class="btn btn-primary me-2"
+            data-bs-toggle="modal"
+            data-bs-target="#profileModal"
+          >
+            Editar Perfil
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#mealModal"
+          >
+            Nova Refeição
+          </button>
+        </div>
+      </div>
 
-            <div class="mb-3">
-              <label for="gender" class="form-label">Sexo Biológico</label>
-              <select class="form-select" id="gender" name="gender" required>
-                <option value="">Selecione...</option>
-                <option value="M">Masculino</option>
-                <option value="F">Feminino</option>
-              </select>
+      <!-- Profile Modal -->
+      <div
+        class="modal fade"
+        id="profileModal"
+        tabindex="-1"
+        aria-labelledby="profileModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="profileModalLabel">
+                Informações Pessoais
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
+            <div class="modal-body">
+              <form id="personal-info-form">
+                <div class="mb-3">
+                  <label for="age" class="form-label">Idade</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="age"
+                    name="age"
+                    required
+                    min="0"
+                    max="120"
+                  />
+                </div>
 
-            <div class="mb-3">
-              <label for="weight" class="form-label">Peso (kg)</label>
-              <input
-                type="number"
-                class="form-control"
-                id="weight"
-                name="weight"
-                required
-                min="0"
-                step="0.1"
-              />
+                <div class="mb-3">
+                  <label for="gender" class="form-label">Sexo Biológico</label>
+                  <select
+                    class="form-select"
+                    id="gender"
+                    name="gender"
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="weight" class="form-label">Peso (kg)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="weight"
+                    name="weight"
+                    required
+                    min="0"
+                    step="0.1"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="height" class="form-label">Altura (cm)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="height"
+                    name="height"
+                    required
+                    min="0"
+                    step="1"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="activity_level_id" class="form-label"
+                    >Nível de Atividade Física</label
+                  >
+                  <select
+                    class="form-select"
+                    id="activity_level_id"
+                    name="activity_level_id"
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="goal_id" class="form-label">Objetivo</label>
+                  <select
+                    class="form-select"
+                    id="goal_id"
+                    name="goal_id"
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                  </select>
+                </div>
+              </form>
             </div>
-
-            <div class="mb-3">
-              <label for="height" class="form-label">Altura (cm)</label>
-              <input
-                type="number"
-                class="form-control"
-                id="height"
-                name="height"
-                required
-                min="0"
-                step="1"
-              />
-            </div>
-
-            <div class="mb-3">
-              <label for="activity_level_id" class="form-label"
-                >Nível de Atividade Física</label
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
               >
-              <select
-                class="form-select"
-                id="activity_level_id"
-                name="activity_level_id"
-                required
+                Fechar
+              </button>
+              <button
+                type="submit"
+                form="personal-info-form"
+                class="btn btn-primary"
               >
-                <option value="">Selecione...</option>
-              </select>
+                Salvar
+              </button>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <div class="mb-3">
-              <label for="goal_id" class="form-label">Objetivo</label>
-              <select class="form-select" id="goal_id" name="goal_id" required>
-                <option value="">Selecione...</option>
-              </select>
+      <!-- Meal Modal -->
+      <div
+        class="modal fade"
+        id="mealModal"
+        tabindex="-1"
+        aria-labelledby="mealModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="mealModalLabel">Nova Refeição</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
+            <div class="modal-body">
+              <form id="new-meal-form" method="post">
+                <div class="mb-4">
+                  <label for="Titulo" class="form-label">Titulo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    aria-describedby="titleHelp"
+                  />
+                  <div id="titleHelp" class="form-text">
+                    Insira um titulo para a sua refeição.
+                  </div>
+                </div>
 
-            <button type="submit" class="btn btn-primary">Salvar</button>
-          </form>
+                <div class="mb-4">
+                  <label for="date" class="form-label">Data</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="date"
+                    name="date"
+                    aria-describedby="dateHelp"
+                  />
+                  <div id="dateHelp" class="form-text">
+                    Insira a data da sua refeição.
+                  </div>
+                </div>
+
+                <div class="autocomplete">
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="autocomplete-input"
+                      placeholder="Pesquisar alimento"
+                      aria-label="Pesquisar alimento"
+                    />
+                  </div>
+
+                  <select
+                    class="form-select d-none mb-2"
+                    aria-label="Resultados da pesquisa"
+                    id="autocomplete-results"
+                  >
+                    <option selected>Selecione um alimento</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-primary mb-4"
+                  id="add-food-button"
+                >
+                  <i class="bi bi-plus-lg"></i> Adicionar alimento selecionado
+                </button>
+
+                <table class="table selected-foods-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Alimento</th>
+                      <th scope="col">Calorias</th>
+                      <th scope="col">Quantidade</th>
+                      <th scope="col">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="selected-foods-table-body">
+                    <!-- Food items will be dynamically added here -->
+                  </tbody>
+                </table>
+
+                <div id="foods-data-container">
+                  <!-- Hidden container for food data -->
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Fechar
+              </button>
+              <button
+                type="submit"
+                form="new-meal-form"
+                class="btn btn-primary"
+              >
+                Salvar
+              </button>
+              <button
+                type="reset"
+                form="new-meal-form"
+                class="btn btn-secondary"
+              >
+                Limpar
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="row gx-4 gy-4">
-        <div class="col col-lg-5">
-          <h3>Nova Refeição</h3>
-
-          <form id="new-meal-form" method="post">
-            <div class="mb-4">
-              <label for="Titulo" class="form-label"> Titulo </label>
-              <input
-                type="text"
-                class="form-control"
-                id="title"
-                name="title"
-                aria-describedby="titleHelp"
-              />
-              <div id="titleHelp" class="form-text">
-                Insira um titulo para a sua refeição.
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label for="date" class="form-label"> Data </label>
-              <input
-                type="datetime-local"
-                class="form-control"
-                id="date"
-                name="date"
-                aria-describedby="dateHelp"
-              />
-              <div id="dateHelp" class="form-text">
-                Insira a data da sua refeição.
-              </div>
-            </div>
-
-            <div class="autocomplete">
-              <div class="input-group mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="autocomplete-input"
-                  placeholder="Pesquisar alimento"
-                  aria-label="Pesquisar alimento"
-                />
-              </div>
-
-              <select
-                class="form-select d-none mb-2"
-                aria-label="Resultados da pesquisa"
-                id="autocomplete-results"
-              >
-                <option selected>Selecione um alimento</option>
-              </select>
-            </div>
-
-            <button
-              type="button"
-              class="btn btn-primary mb-4"
-              id="add-food-button"
-            >
-              <i class="bi bi-plus-lg"></i> Adicionar alimento selecionado
-            </button>
-
-            <table class="table selected-foods-table">
-              <thead>
-                <tr>
-                  <th scope="col">Alimento</th>
-                  <th scope="col">Calorias</th>
-                  <th scope="col">Quantidade</th>
-                  <th scope="col">Ações</th>
-                </tr>
-              </thead>
-              <tbody id="selected-foods-table-body">
-                <!-- Food items will be dynamically added here -->
-              </tbody>
-            </table>
-
-            <div id="foods-data-container">
-              <!-- Hidden container for food data -->
-            </div>
-
-            <button type="submit" class="btn btn-primary">Salvar</button>
-
-            <button type="reset" class="btn btn-secondary">Limpar</button>
-          </form>
-        </div>
-
-        <div class="col col-lg-7">
+        <div class="col col-lg-12">
           <h3>Refeições</h3>
 
           <table class="table meals-table">

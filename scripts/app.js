@@ -523,6 +523,36 @@ const setupPersonalInfoForm = async () => {
   });
 };
 
+// Modal instances
+let profileModal;
+let mealModal;
+
+const setupModals = () => {
+  // Get modal instances
+  profileModal = new bootstrap.Modal(document.getElementById("profileModal"));
+  mealModal = new bootstrap.Modal(document.getElementById("mealModal"));
+
+  // Handle personal info form submission
+  const personalInfoForm = document.getElementById("personal-info-form");
+  if (personalInfoForm) {
+    personalInfoForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      // The form submission logic is already handled in setupPersonalInfoForm
+      profileModal.hide();
+    });
+  }
+
+  // Handle meal form submission
+  const mealForm = document.getElementById("new-meal-form");
+  if (mealForm) {
+    mealForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      // The form submission logic is already handled in submitNewMeal
+      mealModal.hide();
+    });
+  }
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   const foods = await loadFoods();
 
@@ -532,6 +562,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   ]);
 
   initAutocomplete(foods);
-
   setupForm();
+  setupModals();
 });
