@@ -148,14 +148,40 @@ const populateEditForm = (meal) => {
 
     // Add each food from the meal
     meal.foods.forEach(food => {
-      addFoodToSelectedTable(food.id, true);
-      const row = selectedFoodsTableBody.querySelector(`tr[data-food-id="${food.id}"]`);
-      if (row) {
-        const quantityInput = row.querySelector(`input[name="quantity[${food.id}]"]`);
-        if (quantityInput) {
-          quantityInput.value = food.quantity;
-        }
-      }
+      // Create hidden input for food data
+      const foodDataInput = document.createElement('input');
+      foodDataInput.type = 'hidden';
+      foodDataInput.name = `foods[${food.id}]`;
+      foodDataInput.value = food.id;
+      foodsDataContainer.appendChild(foodDataInput);
+
+      // Create table row
+      const selectedFoodElement = document.createElement('tr');
+      selectedFoodElement.setAttribute('data-food-id', food.id);
+
+      const deleteFoodButton = document.createElement('button');
+      deleteFoodButton.type = 'button';
+      deleteFoodButton.className = 'btn btn-danger';
+      deleteFoodButton.addEventListener('click', () => handleDeleteSelectedFood(food.id, true));
+
+      const deleteIcon = document.createElement('i');
+      deleteIcon.className = 'bi bi-x';
+
+      deleteFoodButton.appendChild(deleteIcon);
+
+      const deleteFoodButtonCell = document.createElement('td');
+      deleteFoodButtonCell.appendChild(deleteFoodButton);
+
+      selectedFoodElement.innerHTML = `
+        <td>${food.name} (${food.unit})</td>
+        <td>${food.calories} kcal</td>
+        <td>
+          <input type="number" name="quantity[${food.id}]" class="form-control" min="0" required value="${food.quantity}">
+        </td>
+      `;
+
+      selectedFoodElement.appendChild(deleteFoodButtonCell);
+      selectedFoodsTableBody.appendChild(selectedFoodElement);
     });
   }
 }
