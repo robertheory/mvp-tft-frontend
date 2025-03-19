@@ -464,6 +464,7 @@ const renderMeals = (meals) => {
     const deleteMealButton = document.createElement('button');
     deleteMealButton.type = 'button';
     deleteMealButton.className = 'btn btn-danger';
+    deleteMealButton.title = 'Excluir refeição';
     deleteMealButton.addEventListener('click', () => handleDeleteMeal(meal.id));
 
     const deleteMealIcon = document.createElement('i');
@@ -473,6 +474,7 @@ const renderMeals = (meals) => {
     const editMealButton = document.createElement('button');
     editMealButton.type = 'button';
     editMealButton.className = 'btn btn-primary';
+    editMealButton.title = 'Editar refeição';
     editMealButton.addEventListener('click', () => handleEditMeal(meal.id));
 
     const editMealIcon = document.createElement('i');
@@ -480,17 +482,17 @@ const renderMeals = (meals) => {
     editMealButton.appendChild(editMealIcon);
 
     const actionsCell = document.createElement('td');
-    actionsCell.setAttribute('id', `${meal.id}-actions`);
+    actionsCell.className = 'meals-table__actions-column';
 
-    actionsCell.appendChild(editMealButton);
-    actionsCell.appendChild(deleteMealButton);
+    const actionsContainer = document.createElement('div');
+    actionsContainer.style.display = 'flex';
+    actionsContainer.style.justifyContent = 'center';
+    actionsContainer.style.alignItems = 'center';
+    actionsContainer.style.gap = '0.5rem';
 
-    // styles must be display flex row align-items: center justify-content: center gap 1rem
-    actionsCell.style.display = 'flex';
-    actionsCell.style.justifyContent = 'center';
-    actionsCell.style.alignItems = 'center';
-    actionsCell.style.gap = '1rem';
-    actionsCell.style.width = '100px';
+    actionsContainer.appendChild(editMealButton);
+    actionsContainer.appendChild(deleteMealButton);
+    actionsCell.appendChild(actionsContainer);
 
     mealElement.innerHTML = `
       <td>${meal.title}</td>
@@ -501,7 +503,6 @@ const renderMeals = (meals) => {
     mealElement.appendChild(actionsCell);
 
     mealsTable.appendChild(mealElement);
-
   });
 }
 

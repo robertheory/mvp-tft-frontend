@@ -54,3 +54,103 @@ body {
 .meals-table__actions-column {
   min-width: 250px;
 }
+
+/* Meals Table Styles */
+.meals-table {
+  background-color: var(--bs-body-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+.meals-table thead {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
+.meals-table thead th {
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+.meals-table tbody tr {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.meals-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.meals-table tbody tr:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.meals-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  color: var(--bs-body-color);
+}
+
+.meals-table__actions-column {
+  width: 150px;
+  text-align: center;
+}
+
+.meals-table .btn {
+  padding: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.meals-table .btn i {
+  font-size: 1rem;
+}
+
+.meals-table .btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.meals-table .btn-primary:hover {
+  background-color: var(--bs-primary-dark);
+  border-color: var(--bs-primary-dark);
+  transform: translateY(-1px);
+}
+
+.meals-table .btn-danger {
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+}
+
+.meals-table .btn-danger:hover {
+  background-color: var(--bs-danger-dark);
+  border-color: var(--bs-danger-dark);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meals-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .meals-table thead th {
+    white-space: nowrap;
+  }
+
+  .meals-table tbody td {
+    white-space: nowrap;
+  }
+}
