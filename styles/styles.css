@@ -46,7 +46,23 @@ body {
   height: 100%;
 }
 
-table {
+/* Table Base Styles */
+.table {
   display: table;
   width: 100%;
+}
+
+/* Selected Foods Table */
+.selected-foods-table {
+  min-width: 350px;
+}
+
+/* Meals Table */
+.meals-table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.meals-table__actions-column {
+  min-width: 250px;
 }

@@ -74,13 +74,14 @@
       </symbol>
     </svg>
 
-    <main class="container">
+    <main class="container-fluid">
       <div class="col text-center">
         <h1 class="display-1">Total Fitness Tracker</h1>
         <p class="lead">Seja mais FIT agora mesmo!</p>
       </div>
-      <div class="row g-4">
-        <div class="col col-4">
+
+      <div class="row gx-4 gy-4">
+        <div class="col col-lg-5">
           <h3>Nova Refeição</h3>
 
           <form id="new-meal-form" method="post">
@@ -120,13 +121,7 @@
                   id="autocomplete-input"
                   placeholder="Pesquisar alimento"
                   aria-label="Pesquisar alimento"
-                  aria-describedby="autocomplete-addon"
                 />
-                <span class="input-group-text" id="autocomplete-addon">
-                  <svg class="bi" width="16" height="16">
-                    <use xlink:href="#grid" />
-                  </svg>
-                </span>
               </div>
 
               <select
@@ -146,9 +141,7 @@
               <i class="bi bi-plus-lg"></i> Adicionar alimento selecionado
             </button>
 
-            <!-- tabela com os alimentos selecionados -->
-
-            <table class="table" style="min-width: 350px">
+            <table class="table selected-foods-table">
               <thead>
                 <tr>
                   <th scope="col">Alimento</th>
@@ -172,16 +165,16 @@
           </form>
         </div>
 
-        <div class="col col-8">
+        <div class="col col-lg-7">
           <h3>Refeições</h3>
 
-          <table class="table" style="width: 100%">
+          <table class="table meals-table">
             <thead>
               <tr>
                 <th scope="col">Titulo</th>
                 <th scope="col">Calorias</th>
                 <th scope="col">Data</th>
-                <th scope="col" style="min-width: 200px">Ações</th>
+                <th scope="col" class="meals-table__actions-column">Ações</th>
               </tr>
             </thead>
             <tbody id="meals-table-body"></tbody>
