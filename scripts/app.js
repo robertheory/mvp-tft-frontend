@@ -12,6 +12,35 @@ const handleDeleteSelectedFood = (foodId) => {
   if (foodInput) {
     foodsDataContainer.removeChild(foodInput);
   }
+
+  // Save form data after removing food
+  saveFormData();
+}
+
+const saveFormData = () => {
+  const form = document.getElementById('new-meal-form');
+  const formData = new FormData(form);
+  const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+
+  if (!selectedFoodsTableBody) return;
+
+  const foods = [];
+  const rows = selectedFoodsTableBody.querySelectorAll('tr');
+
+  rows.forEach(row => {
+    const foodId = row.getAttribute('data-food-id');
+    const quantityInput = row.querySelector(`input[name="quantity[${foodId}]"]`);
+    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+    foods.push({ id: foodId, quantity });
+  });
+
+  const data = {
+    title: formData.get('title') || '',
+    date: formData.get('date') || new Date().toISOString().slice(0, 16),
+    foods
+  };
+
+  localStorage.setItem('tft:new-meal-form', JSON.stringify(data));
 }
 
 const addFoodToSelectedTable = (foodId) => {
@@ -53,7 +82,7 @@ const addFoodToSelectedTable = (foodId) => {
     <td>${food.name} (${food.unit})</td>
     <td>${food.calories} kcal</td>
     <td>
-      <input type="number" name="quantity[${food.id}]" class="form-control" min="1" required>
+      <input type="number" name="quantity[${food.id}]" class="form-control" min="0" required value="0">
     </td>
   `;
 
@@ -64,6 +93,9 @@ const addFoodToSelectedTable = (foodId) => {
   if (!selectedFoodsTableBody) return;
 
   selectedFoodsTableBody.appendChild(selectedFoodElement);
+
+  // Save form data after adding food
+  saveFormData();
 }
 
 const getSelectedFoods = () => {
@@ -124,10 +156,7 @@ const setupForm = () => {
 
   newMealForm.addEventListener('submit', submitNewMeal);
 
-  newMealForm.addEventListener('input', () => {
-    const formData = new FormData(newMealForm);
-    localStorage.setItem('tft:new-meal-form', JSON.stringify(Object.fromEntries(formData.entries())));
-  });
+  newMealForm.addEventListener('input', saveFormData);
 
   newMealForm.addEventListener('reset', () => {
     localStorage.removeItem('tft:new-meal-form');
@@ -146,16 +175,64 @@ const setupForm = () => {
   const localFormData = localStorage.getItem('tft:new-meal-form');
 
   if (!localFormData) {
-    const formData = new FormData(newMealForm);
-    localStorage.setItem('tft:new-meal-form', JSON.stringify(Object.fromEntries(formData.entries())));
+    saveFormData();
   } else {
-    const parsedFormData = JSON.parse(localFormData);
+    const data = JSON.parse(localFormData);
 
-    for (const key in parsedFormData) {
-      const element = newMealForm.elements[key];
-      if (element) {
-        element.value = parsedFormData[key];
-      }
+    // Restore basic form fields
+    newMealForm.elements['title'].value = data.title || '';
+    newMealForm.elements['date'].value = data.date || new Date().toISOString().slice(0, 16);
+
+    // Restore selected foods
+    const foods = JSON.parse(localStorage.getItem('foods')) || [];
+    const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
+    const foodsDataContainer = document.getElementById('foods-data-container');
+
+    if (selectedFoodsTableBody && foodsDataContainer) {
+      // Clear existing content
+      selectedFoodsTableBody.innerHTML = '';
+      foodsDataContainer.innerHTML = '';
+
+      // Restore each food
+      data.foods.forEach(foodData => {
+        const food = foods.find(f => f.id === foodData.id);
+        if (food) {
+          // Create hidden input
+          const foodDataInput = document.createElement('input');
+          foodDataInput.type = 'hidden';
+          foodDataInput.name = `foods[${food.id}]`;
+          foodDataInput.value = food.id;
+          foodsDataContainer.appendChild(foodDataInput);
+
+          // Create table row
+          const selectedFoodElement = document.createElement('tr');
+          selectedFoodElement.setAttribute('data-food-id', food.id);
+
+          const deleteFoodButton = document.createElement('button');
+          deleteFoodButton.type = 'button';
+          deleteFoodButton.className = 'btn btn-danger';
+          deleteFoodButton.addEventListener('click', () => handleDeleteSelectedFood(food.id));
+
+          const deleteIcon = document.createElement('i');
+          deleteIcon.className = 'bi bi-x';
+
+          deleteFoodButton.appendChild(deleteIcon);
+
+          const deleteFoodButtonCell = document.createElement('td');
+          deleteFoodButtonCell.appendChild(deleteFoodButton);
+
+          selectedFoodElement.innerHTML = `
+            <td>${food.name} (${food.unit})</td>
+            <td>${food.calories} kcal</td>
+            <td>
+              <input type="number" name="quantity[${food.id}]" class="form-control" min="0" required value="${foodData.quantity || 0}">
+            </td>
+          `;
+
+          selectedFoodElement.appendChild(deleteFoodButtonCell);
+          selectedFoodsTableBody.appendChild(selectedFoodElement);
+        }
+      });
     }
   }
 }
@@ -313,8 +390,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadMeals();
 
   initAutocomplete(foods);
-
-
 
   setupForm();
 });
