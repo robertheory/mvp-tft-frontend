@@ -37,6 +37,7 @@
     <!-- STYLES IMPORTS -->
 
     <link rel="stylesheet" href="./styles/styles.css" />
+    <link rel="stylesheet" href="./styles/navbars.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
@@ -66,6 +67,20 @@
     ></script>
   </head>
   <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container">
+        <a class="navbar-brand" href="#">Total Fitness Tracker</a>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#profileModal"
+        >
+          Editar Perfil
+        </button>
+      </div>
+    </nav>
+
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="grid" viewBox="0 0 16 16">
         <path
@@ -75,33 +90,6 @@
     </svg>
 
     <main class="container">
-      <div class="col text-center">
-        <h1 class="display-1">Total Fitness Tracker</h1>
-        <p class="lead">Seja mais FIT agora mesmo!</p>
-      </div>
-
-      <!-- Modal Trigger Buttons -->
-      <div class="row mb-5">
-        <div class="col-12 text-center">
-          <button
-            type="button"
-            class="btn btn-primary me-2"
-            data-bs-toggle="modal"
-            data-bs-target="#profileModal"
-          >
-            Editar Perfil
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#mealModal"
-          >
-            Nova Refeição
-          </button>
-        </div>
-      </div>
-
       <!-- Profile Modal -->
       <div
         class="modal fade"
@@ -474,23 +462,33 @@
         </div>
       </div>
 
-      <div class="row gx-4 gy-4">
-        <div class="col col-lg-12">
-          <h3>Refeições</h3>
-
-          <table class="table meals-table">
-            <thead>
-              <tr>
-                <th scope="col">Titulo</th>
-                <th scope="col">Calorias</th>
-                <th scope="col">Data</th>
-                <th scope="col" class="meals-table__actions-column">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="meals-table-body"></tbody>
-          </table>
+      <div class="row">
+        <div
+          class="col-12 d-flex justify-content-between align-items-center mb-4"
+        >
+          <h3 class="mb-0">Refeições</h3>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#mealModal"
+          >
+            Nova Refeição
+          </button>
         </div>
       </div>
+
+      <table class="table meals-table">
+        <thead>
+          <tr>
+            <th scope="col">Titulo</th>
+            <th scope="col">Calorias</th>
+            <th scope="col">Data</th>
+            <th scope="col" class="meals-table__actions-column">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="meals-table-body"></tbody>
+      </table>
     </main>
 
     <!-- Toast Container -->
