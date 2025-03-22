@@ -5,16 +5,51 @@
  */
 
 /**
+ * @typedef {Object} Rates
+ * @property {number} bmr - BMR
+ * @property {number} tdee - TDEE
+ */
+
+/**
  * @typedef {Object} Stats
  * @property {number} bmr - BMR
  * @property {number} tdee - TDEE
  * @property {HistoryItem[]} history - Calories history
+ */
+
+/**
+ * Loads BMR and TDEE rates from the API
+ * @returns {Promise<Rates>}
+ */
+const loadRates = async () => {
+  const response = await fetch('http://192.168.1.17:5000/stats/rates');
+  return await response.json();
+}
+
+/**
+ * Loads calories history from the API
+ * @returns {Promise<HistoryItem[]>}
+ */
+const loadHistory = async () => {
+  const response = await fetch('http://192.168.1.17:5000/stats/history');
+  return await response.json();
+}
+
+/**
+ * Loads all stats data from the API
  * @returns {Promise<Stats>}
  */
 const loadStats = async () => {
-  const response = await fetch('http://192.168.1.17:5000/stats');
-  const stats = await response.json();
-  return stats;
+  const [rates, history] = await Promise.all([
+    loadRates(),
+    loadHistory()
+  ]);
+
+  return {
+    bmr: rates.bmr,
+    tdee: rates.tdee,
+    history: history
+  };
 }
 
 function getWeekDayName(date) {
