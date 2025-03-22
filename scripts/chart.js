@@ -229,9 +229,13 @@ async function initCaloriesChart() {
   });
 }
 
-// Export the update function to be used in app.js
 window.updateCaloriesChart = () => {
   setTimeout(updateChart, 500);
+};
+
+window.updateRates = async () => {
+  const stats = await loadStats();
+  updateRatesDisplay(stats);
 };
 
 document.addEventListener("DOMContentLoaded", initCaloriesChart);

@@ -521,6 +521,8 @@ const PersonalInfoHandler = {
 
         if (response.ok) {
           UI.showToast('Personal information updated successfully!', 'success');
+          window.updateRates();
+          window.updateCaloriesChart();
         } else {
           UI.showToast('Error updating personal information. Please try again.', 'danger');
         }
