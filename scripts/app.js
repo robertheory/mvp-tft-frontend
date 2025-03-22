@@ -7,16 +7,13 @@ const handleDeleteSelectedFood = (foodId, isEdit = false) => {
 
   if (!selectedFoodsTableBody || !foodsDataContainer) return;
 
-  // Remove the table row
   selectedFoodsTableBody.removeChild(selectedFoodsTableBody.querySelector(`tr[data-food-id="${foodId}"]`));
 
-  // Remove the hidden input from the container
   const foodInput = foodsDataContainer.querySelector(`input[name="foods[${foodId}]"]`);
   if (foodInput) {
     foodsDataContainer.removeChild(foodInput);
   }
 
-  // Save form data after removing food
   if (!isEdit) {
     saveFormData();
   }
@@ -58,10 +55,9 @@ const addFoodToSelectedTable = (foodId, isEdit = false) => {
 
   if (!foodsDataContainer || !selectedFoodsTableBody) return;
 
-  // Check if food is already in the table
   const existingFood = selectedFoodsTableBody.querySelector(`tr[data-food-id="${foodId}"]`);
   if (existingFood) {
-    return; // Food already exists, do nothing
+    return;
   }
 
   const food = foods.find(food => food.id === foodId);
@@ -70,7 +66,6 @@ const addFoodToSelectedTable = (foodId, isEdit = false) => {
     return;
   }
 
-  // Create hidden input for food data
   const foodDataInput = document.createElement('input');
   foodDataInput.type = 'hidden';
   foodDataInput.name = `foods[${food.id}]`;
@@ -104,7 +99,6 @@ const addFoodToSelectedTable = (foodId, isEdit = false) => {
   selectedFoodElement.appendChild(deleteFoodButtonCell);
   selectedFoodsTableBody.appendChild(selectedFoodElement);
 
-  // Save form data after adding food
   if (!isEdit) {
     saveFormData();
   }
@@ -136,7 +130,11 @@ const populateEditForm = (meal) => {
   // Set basic form fields
   form.elements['id'].value = meal.id;
   form.elements['title'].value = meal.title;
-  form.elements['date'].value = new Date(meal.date).toISOString().slice(0, 16);
+
+  // Adjusts the date to the local timezone
+  const mealDate = new Date(meal.date);
+  mealDate.setHours(mealDate.getHours() - 3);
+  form.elements['date'].value = mealDate.toISOString().slice(0, 16);
 
   // Clear existing foods
   const selectedFoodsTableBody = document.getElementById('edit-selected-foods-table-body');
@@ -146,7 +144,6 @@ const populateEditForm = (meal) => {
     selectedFoodsTableBody.innerHTML = '';
     foodsDataContainer.innerHTML = '';
 
-    // Add each food from the meal
     meal.foods.forEach(food => {
       // Create hidden input for food data
       const foodDataInput = document.createElement('input');
@@ -207,9 +204,9 @@ const submitEditMeal = async (e) => {
 
     const formData = new FormData(e.target);
     const mealId = formData.get('id');
+
     const formattedDate = new Date(formData.get('date')).toISOString();
 
-    // Get all food IDs and their quantities
     const foods = getSelectedFoods(true);
 
     const requestBody = {
@@ -244,9 +241,8 @@ const submitNewMeal = async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const formattedDate = new Date().toISOString();
+    const formattedDate = new Date(formData.get('date')).toISOString();
 
-    // Get all food IDs and their quantities
     const foods = getSelectedFoods();
 
     const requestBody = {
@@ -287,6 +283,7 @@ const setupForm = () => {
 
   newMealForm.addEventListener('reset', () => {
     localStorage.removeItem('tft:new-meal-form');
+
     // Clear the foods data container and selected foods table
     const foodsDataContainer = document.getElementById('foods-data-container');
     const selectedFoodsTableBody = document.getElementById('selected-foods-table-body');
@@ -308,7 +305,12 @@ const setupForm = () => {
 
     // Restore basic form fields
     newMealForm.elements['title'].value = data.title || '';
-    newMealForm.elements['date'].value = data.date || new Date().toISOString().slice(0, 16);
+
+    const mealDate = new Date(data.date);
+
+    mealDate.setHours(mealDate.getHours() - 3);
+
+    newMealForm.elements['date'].value = mealDate.toISOString().slice(0, 16);
 
     // Restore selected foods
     const foods = JSON.parse(localStorage.getItem('foods')) || [];
@@ -378,7 +380,6 @@ const createFoodOption = (food) => {
 }
 
 const initAutocomplete = (foods) => {
-  // Initialize autocomplete for new meal form
   const autocompleteInput = document.getElementById('autocomplete-input');
   const addFoodButton = document.getElementById('add-food-button');
 
@@ -630,13 +631,10 @@ const showToast = (message, type = 'success') => {
   const toastElement = document.getElementById('toast');
   const toastBody = toastElement.querySelector('.toast-body');
 
-  // Set toast background color based on type
   toastElement.className = `toast bg-${type}`;
 
-  // Set message
   toastBody.textContent = message;
 
-  // Show toast
   toast = new bootstrap.Toast(toastElement);
   toast.show();
 };
@@ -645,13 +643,11 @@ const setupPersonalInfoForm = async () => {
   const form = document.getElementById('personal-info-form');
   if (!form) return;
 
-  // Load and populate activity levels and goals
   await Promise.all([
     populateActivityLevels(),
     populateGoals()
   ]);
 
-  // Load current personal info
   const currentInfo = await loadCurrentPersonalInfo();
   if (currentInfo) {
     form.elements['age'].value = currentInfo.age;
@@ -662,7 +658,6 @@ const setupPersonalInfoForm = async () => {
     form.elements['goal_id'].value = currentInfo.goal_id;
   }
 
-  // Handle form submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -697,39 +692,32 @@ const setupPersonalInfoForm = async () => {
   });
 };
 
-// Modal instances
 let profileModal;
 let mealModal;
 let editMealModal;
 let toast;
 
 const setupModals = () => {
-  // Get modal instances
   profileModal = new bootstrap.Modal(document.getElementById("profileModal"));
   mealModal = new bootstrap.Modal(document.getElementById("mealModal"));
   editMealModal = new bootstrap.Modal(document.getElementById("editMealModal"));
 
-  // Handle personal info form submission
   const personalInfoForm = document.getElementById("personal-info-form");
   if (personalInfoForm) {
     personalInfoForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      // The form submission logic is already handled in setupPersonalInfoForm
       profileModal.hide();
     });
   }
 
-  // Handle meal form submission
   const mealForm = document.getElementById("new-meal-form");
   if (mealForm) {
     mealForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      // The form submission logic is already handled in submitNewMeal
       mealModal.hide();
     });
   }
 
-  // Handle edit meal form submission
   const editMealForm = document.getElementById("edit-meal-form");
   if (editMealForm) {
     editMealForm.addEventListener("submit", submitEditMeal);
