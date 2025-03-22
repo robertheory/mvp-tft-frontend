@@ -269,6 +269,7 @@ const MealHandler = {
         UI.showToast('Meal updated successfully!', 'success');
         await this.loadAndRenderMeals();
         state.modals.editMeal.hide();
+        window.updateCaloriesChart();
       } else {
         UI.showToast('Error updating meal. Please try again.', 'danger');
       }
@@ -298,6 +299,7 @@ const MealHandler = {
         UI.showToast('Meal created successfully!', 'success');
         await this.loadAndRenderMeals();
         e.target.reset();
+        window.updateCaloriesChart();
       } else {
         UI.showToast('Error creating meal. Please try again.', 'danger');
       }
@@ -315,6 +317,7 @@ const MealHandler = {
       if (response.ok) {
         UI.showToast('Meal deleted successfully!', 'success');
         await this.loadAndRenderMeals();
+        window.updateCaloriesChart();
       } else {
         UI.showToast('Error deleting meal. Please try again.', 'danger');
       }

@@ -17,6 +17,8 @@
  * @property {HistoryItem[]} history - Calories history
  */
 
+let caloriesChart = null;
+
 /**
  * Loads BMR and TDEE rates from the API
  * @returns {Promise<Rates>}
@@ -73,6 +75,39 @@ function getWeekDayName(dateStr) {
   return `${weekDays[date.getDay()]} ${day}/${month}`;
 }
 
+/**
+ * Updates the chart with new data
+ */
+async function updateChart() {
+  const stats = await loadStats();
+  const calorieLimit = stats.tdee;
+
+  const sortedHistory = [...stats.history].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA - dateB;
+  });
+
+  const filteredData = {
+    labels: [],
+    calories: [],
+    limit: []
+  };
+
+  sortedHistory.forEach(item => {
+    filteredData.labels.push(getWeekDayName(item.date));
+    filteredData.calories.push(item.value);
+    filteredData.limit.push(calorieLimit);
+  });
+
+  if (caloriesChart) {
+    caloriesChart.data.labels = filteredData.labels;
+    caloriesChart.data.datasets[0].data = filteredData.calories;
+    caloriesChart.data.datasets[1].data = filteredData.limit;
+    caloriesChart.update();
+  }
+}
+
 async function initCaloriesChart() {
   const stats = await loadStats();
   const calorieLimit = stats.tdee;
@@ -97,7 +132,7 @@ async function initCaloriesChart() {
 
   const ctx = document.getElementById("caloriesChart");
 
-  new Chart(ctx, {
+  caloriesChart = new Chart(ctx, {
     type: "line",
     data: {
       labels: filteredData.labels,
@@ -164,5 +199,10 @@ async function initCaloriesChart() {
     },
   });
 }
+
+// Export the update function to be used in app.js
+window.updateCaloriesChart = () => {
+  setTimeout(updateChart, 500);
+};
 
 document.addEventListener("DOMContentLoaded", initCaloriesChart);
