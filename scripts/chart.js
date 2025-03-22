@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} HistoryItem
- * @property {number} value
- * @property {number} weekday
+ * @property {number} value - Caloric value
+ * @property {string} date - Date in MM/DD format
  */
 
 /**
@@ -52,48 +52,59 @@ const loadStats = async () => {
   };
 }
 
-function getWeekDayName(date) {
+function getWeekDayName(dateStr) {
   const weekDays = [
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
-    "Domingo",
+    "DOM", // Domingo
+    "SEG", // Segunda
+    "TER", // Terça
+    "QUA", // Quarta
+    "QUI", // Quinta
+    "SEX", // Sexta
+    "SAB"  // Sábado
   ];
-  return weekDays[date.getDay()];
+
+  // Parse the full date string to a Date object
+  const date = new Date(dateStr);
+
+  // Format the date as dd/mm
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+  return `${weekDays[date.getDay()]} ${day}/${month}`;
 }
 
 async function initCaloriesChart() {
   const stats = await loadStats();
+  const calorieLimit = stats.tdee;
 
-  const today = new Date();
-  const labels = [];
-  const caloriesData = Array(7).fill(null);
-
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    labels.push(getWeekDayName(date));
-  }
-
-  stats.history.forEach(item => {
-    caloriesData[item.weekday] = item.value;
+  const sortedHistory = [...stats.history].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA - dateB;
   });
 
-  const calorieLimit = stats.tdee;
+  const filteredData = {
+    labels: [],
+    calories: [],
+    limit: []
+  };
+
+  sortedHistory.forEach(item => {
+    filteredData.labels.push(getWeekDayName(item.date));
+    filteredData.calories.push(item.value);
+    filteredData.limit.push(calorieLimit);
+  });
 
   const ctx = document.getElementById("caloriesChart");
 
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: labels,
+      labels: filteredData.labels,
       datasets: [
         {
           label: "Consumo Calórico",
-          data: caloriesData,
+          data: filteredData.calories,
           borderColor: "rgb(75, 192, 192)",
           tension: 0.1,
           fill: false,
@@ -102,7 +113,7 @@ async function initCaloriesChart() {
         },
         {
           label: "Limite Calórico",
-          data: Array(labels.length).fill(calorieLimit),
+          data: filteredData.limit,
           borderColor: "rgb(255, 99, 132)",
           borderDash: [5, 5],
           fill: false,
