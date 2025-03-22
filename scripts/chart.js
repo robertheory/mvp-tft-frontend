@@ -1,89 +1,91 @@
 /**
  * @typedef {Object} HistoryItem
  * @property {number} value - Caloric value
- * @property {string} date - Date in MM/DD format
+ * @property {string} date - Full date string
  */
 
 /**
  * @typedef {Object} Rates
- * @property {number} bmr - BMR
- * @property {number} tdee - TDEE
+ * @property {number} bmr - Basal Metabolic Rate
+ * @property {number} tdee - Total Daily Energy Expenditure
  */
 
 /**
  * @typedef {Object} Stats
- * @property {number} bmr - BMR
- * @property {number} tdee - TDEE
- * @property {HistoryItem[]} history - Calories history
+ * @property {number} bmr - Basal Metabolic Rate
+ * @property {number} tdee - Total Daily Energy Expenditure
+ * @property {HistoryItem[]} history - Caloric history
  */
 
-let caloriesChart = null;
 
-/**
- * Loads BMR and TDEE rates from the API
- * @returns {Promise<Rates>}
- */
-const loadRates = async () => {
-  const response = await fetch('http://192.168.1.17:5000/stats/rates');
-  return await response.json();
-}
+const ChartConfig = {
+  colors: {
+    consumption: 'rgb(75, 192, 192)',
+    limit: 'rgb(255, 99, 132)'
+  },
+  weekDays: ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"]
+};
 
-/**
- * Loads calories history from the API
- * @returns {Promise<HistoryItem[]>}
- */
-const loadHistory = async () => {
-  const response = await fetch('http://192.168.1.17:5000/stats/history');
-  return await response.json();
-}
+const StatsService = {
+  /**
+   * @returns {Promise<Rates>}
+   */
+  async loadRates() {
+    const response = await fetch('http://192.168.1.17:5000/stats/rates');
+    return await response.json();
+  },
 
-/**
- * Loads all stats data from the API
- * @returns {Promise<Stats>}
- */
-const loadStats = async () => {
-  const [rates, history] = await Promise.all([
-    loadRates(),
-    loadHistory()
-  ]);
+  /**
+   * @returns {Promise<HistoryItem[]>}
+   */
+  async loadHistory() {
+    const response = await fetch('http://192.168.1.17:5000/stats/history');
+    return await response.json();
+  },
 
-  return {
-    bmr: rates.bmr,
-    tdee: rates.tdee,
-    history: history
-  };
-}
+  /**
+   * @returns {Promise<Stats>}
+   */
+  async loadStats() {
+    const [rates, history] = await Promise.all([
+      this.loadRates(),
+      this.loadHistory()
+    ]);
 
-function getWeekDayName(dateStr) {
-  const weekDays = [
-    "DOM", // Domingo
-    "SEG", // Segunda
-    "TER", // Terça
-    "QUA", // Quarta
-    "QUI", // Quinta
-    "SEX", // Sexta
-    "SAB"  // Sábado
-  ];
+    return {
+      bmr: rates.bmr,
+      tdee: rates.tdee,
+      history: history
+    };
+  }
+};
 
-  // Parse the full date string to a Date object
-  const date = new Date(dateStr);
+const DateFormatter = {
+  /**
+   * Formats a date string with weekday
+   * @param {string} dateStr - Input date string
+   * @returns {string} Formatted date (e.g., "DOM 07/04")
+   */
+  formatDateWithWeekDay(dateStr) {
+    const date = new Date(dateStr);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
 
-  // Format the date as dd/mm
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${ChartConfig.weekDays[date.getDay()]} ${day}/${month}`;
+  }
+};
 
-  return `${weekDays[date.getDay()]} ${day}/${month}`;
-}
+const RatesDisplay = {
+  /**
+   * Updates the metabolic rates display
+   * @param {Stats} stats
+   */
+  update(stats) {
+    const container = document.getElementById('rates-container');
+    if (!container) return;
 
-/**
- * Updates the rates display in the rates container
- * @param {Stats} stats - The stats data containing BMR and TDEE
- */
-function updateRatesDisplay(stats) {
-  const ratesContainer = document.getElementById('rates-container');
-  if (ratesContainer) {
-    ratesContainer.className = 'card mb-4';
-    ratesContainer.innerHTML = `
+    container.className = 'card mb-4';
+    container.innerHTML = `
       <div class="card-body">
         <div class="d-flex justify-content-around">
           <div class="text-center">
@@ -98,144 +100,140 @@ function updateRatesDisplay(stats) {
       </div>
     `;
   }
-}
+};
 
-/**
- * Updates the chart with new data
- */
-async function updateChart() {
-  const stats = await loadStats();
-  const calorieLimit = stats.tdee;
+const CaloriesChart = {
+  instance: null,
 
-  updateRatesDisplay(stats);
+  /**
+   * @param {Stats} stats
+   * @returns {Object} Formatted chart data
+   */
+  prepareChartData(stats) {
+    const sortedHistory = [...stats.history].sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
 
-  const sortedHistory = [...stats.history].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateA - dateB;
-  });
+    return {
+      labels: sortedHistory.map(item => DateFormatter.formatDateWithWeekDay(item.date)),
+      calories: sortedHistory.map(item => item.value),
+      limit: sortedHistory.map(() => stats.tdee)
+    };
+  },
 
-  const filteredData = {
-    labels: [],
-    calories: [],
-    limit: []
-  };
+  /**
+   * @param {Object} data
+   * @returns {Object} Chart.js configuration
+   */
+  createChartConfig(data) {
+    return {
+      type: "line",
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: "Consumo Calórico",
+            data: data.calories,
+            borderColor: ChartConfig.colors.consumption,
+            tension: 0.1,
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+          {
+            label: "Limite Calórico",
+            data: data.limit,
+            borderColor: ChartConfig.colors.limit,
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Calorias",
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Dia da Semana",
+            },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Consumo Calórico dos Últimos 7 Dias",
+          },
+          tooltip: {
+            callbacks: {
+              title: function (tooltipItems) {
+                return tooltipItems[0].label;
+              },
+              label: function (context) {
+                return `${context.dataset.label}: ${context.parsed.y} kcal`;
+              },
+            },
+          },
+        },
+      },
+    };
+  },
 
-  sortedHistory.forEach(item => {
-    filteredData.labels.push(getWeekDayName(item.date));
-    filteredData.calories.push(item.value);
-    filteredData.limit.push(calorieLimit);
-  });
+  /**
+   * Updates chart data and display
+   */
+  async update() {
+    const stats = await StatsService.loadStats();
+    const data = this.prepareChartData(stats);
 
-  if (caloriesChart) {
-    caloriesChart.data.labels = filteredData.labels;
-    caloriesChart.data.datasets[0].data = filteredData.calories;
-    caloriesChart.data.datasets[1].data = filteredData.limit;
-    caloriesChart.update();
+    RatesDisplay.update(stats);
+
+    if (this.instance) {
+      this.instance.data.labels = data.labels;
+      this.instance.data.datasets[0].data = data.calories;
+      this.instance.data.datasets[1].data = data.limit;
+      this.instance.update();
+    }
+  },
+
+  /**
+   * Initializes the chart
+   */
+  async init() {
+    const stats = await StatsService.loadStats();
+    const data = this.prepareChartData(stats);
+
+    RatesDisplay.update(stats);
+
+    const ctx = document.getElementById("caloriesChart");
+    if (!ctx) return;
+
+    this.instance = new Chart(ctx, this.createChartConfig(data));
   }
-}
-
-async function initCaloriesChart() {
-  const stats = await loadStats();
-  const calorieLimit = stats.tdee;
-
-  updateRatesDisplay(stats);
-
-  const sortedHistory = [...stats.history].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateA - dateB;
-  });
-
-  const filteredData = {
-    labels: [],
-    calories: [],
-    limit: []
-  };
-
-  sortedHistory.forEach(item => {
-    filteredData.labels.push(getWeekDayName(item.date));
-    filteredData.calories.push(item.value);
-    filteredData.limit.push(calorieLimit);
-  });
-
-  const ctx = document.getElementById("caloriesChart");
-
-  caloriesChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: filteredData.labels,
-      datasets: [
-        {
-          label: "Consumo Calórico",
-          data: filteredData.calories,
-          borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-          fill: false,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        },
-        {
-          label: "Limite Calórico",
-          data: filteredData.limit,
-          borderColor: "rgb(255, 99, 132)",
-          borderDash: [5, 5],
-          fill: false,
-          pointRadius: 0,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Calorias",
-          },
-        },
-        x: {
-          title: {
-            display: true,
-            text: "Dia da Semana",
-          },
-          ticks: {
-            maxRotation: 45,
-            minRotation: 45,
-          },
-        },
-      },
-      plugins: {
-        legend: {
-          position: "top",
-        },
-        title: {
-          display: true,
-          text: "Consumo Calórico dos Últimos 7 Dias",
-        },
-        tooltip: {
-          callbacks: {
-            title: function (tooltipItems) {
-              return tooltipItems[0].label;
-            },
-            label: function (context) {
-              return `${context.dataset.label}: ${context.parsed.y} kcal`;
-            },
-          },
-        },
-      },
-    },
-  });
-}
+};
 
 window.updateCaloriesChart = () => {
-  setTimeout(updateChart, 500);
+  setTimeout(() => CaloriesChart.update(), 500);
 };
 
 window.updateRates = async () => {
-  const stats = await loadStats();
-  updateRatesDisplay(stats);
+  const stats = await StatsService.loadStats();
+  RatesDisplay.update(stats);
 };
 
-document.addEventListener("DOMContentLoaded", initCaloriesChart);
+document.addEventListener("DOMContentLoaded", () => CaloriesChart.init());
