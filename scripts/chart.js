@@ -76,11 +76,38 @@ function getWeekDayName(dateStr) {
 }
 
 /**
+ * Updates the rates display in the rates container
+ * @param {Stats} stats - The stats data containing BMR and TDEE
+ */
+function updateRatesDisplay(stats) {
+  const ratesContainer = document.getElementById('rates-container');
+  if (ratesContainer) {
+    ratesContainer.className = 'card mb-4';
+    ratesContainer.innerHTML = `
+      <div class="card-body">
+        <div class="d-flex justify-content-around">
+          <div class="text-center">
+            <h6 class="text-muted mb-2">Taxa Basal Metabólica (TBM)</h6>
+            <p class="h3 mb-0">${Math.round(stats.bmr)} kcal</p>
+          </div>
+          <div class="text-center">
+            <h6 class="text-muted mb-2">Gasto Energético Total (GET)</h6>
+            <p class="h3 mb-0">${Math.round(stats.tdee)} kcal</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/**
  * Updates the chart with new data
  */
 async function updateChart() {
   const stats = await loadStats();
   const calorieLimit = stats.tdee;
+
+  updateRatesDisplay(stats);
 
   const sortedHistory = [...stats.history].sort((a, b) => {
     const dateA = new Date(a.date);
@@ -111,6 +138,8 @@ async function updateChart() {
 async function initCaloriesChart() {
   const stats = await loadStats();
   const calorieLimit = stats.tdee;
+
+  updateRatesDisplay(stats);
 
   const sortedHistory = [...stats.history].sort((a, b) => {
     const dateA = new Date(a.date);
