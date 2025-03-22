@@ -170,3 +170,17 @@ body {
 .navbar .btn-primary {
   padding: 0.5rem 1rem;
 }
+
+/* Chart styles */
+.card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.card-title {
+  color: var(--bs-primary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
