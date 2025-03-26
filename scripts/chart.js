@@ -17,7 +17,6 @@
  * @property {HistoryItem[]} history - Caloric history
  */
 
-
 const ChartConfig = {
   colors: {
     consumption: 'rgb(75, 192, 192)',
@@ -198,15 +197,19 @@ const CaloriesChart = {
    * Shows a message when there's no data
    */
   showNoDataMessage() {
-    const ctx = document.getElementById("caloriesChart");
-    if (!ctx) return;
+    const chartContainer = document.getElementById("calories-chart-container");
+    if (!chartContainer) return;
 
-    ctx.innerHTML = `
-      <div class="text-center p-4">
-        <p class="text-muted mb-0">
-          <i class="bi bi-info-circle me-2"></i>
-          Sem refeições recentes - adicione refeições para visualizar mais dados
-        </p>
+    chartContainer.innerHTML = `
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="text-center p-4">
+            <p class="text-muted mb-0">
+              <i class="bi bi-info-circle me-2"></i>
+              Sem refeições recentes - adicione refeições para visualizar mais dados
+            </p>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -217,20 +220,31 @@ window.updateCaloriesChart = async () => {
     try {
       const stats = await StatsService.loadStats();
 
-      // Check if history is empty or undefined
       if (!stats.history || stats.history.length === 0) {
         CaloriesChart.showNoDataMessage();
       } else {
+        const chartContainer = document.getElementById("calories-chart-container");
+        if (!chartContainer) return;
+
+        let canvas = document.getElementById('caloriesChart');
+        if (!canvas) {
+          canvas = document.createElement('canvas');
+          canvas.id = 'caloriesChart';
+          chartContainer.innerHTML = '';
+          chartContainer.appendChild(canvas);
+        }
+
         const data = CaloriesChart.prepareChartData(stats);
         if (CaloriesChart.instance) {
           CaloriesChart.instance.data.labels = data.labels;
           CaloriesChart.instance.data.datasets[0].data = data.calories;
           CaloriesChart.instance.data.datasets[1].data = data.limit;
           CaloriesChart.instance.update();
+        } else {
+          CaloriesChart.instance = new Chart(canvas, CaloriesChart.createChartConfig(data));
         }
       }
 
-      // Update rates display regardless of history
       RatesDisplay.update(stats);
     } catch (error) {
       console.error('Error updating chart and rates:', error);
@@ -244,18 +258,21 @@ window.initCaloriesChart = async () => {
   try {
     const stats = await StatsService.loadStats();
 
-    // Check if history is empty or undefined
     if (!stats.history || stats.history.length === 0) {
       CaloriesChart.showNoDataMessage();
     } else {
+      const chartContainer = document.getElementById("calories-chart-container");
+      if (!chartContainer) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.id = 'caloriesChart';
+      chartContainer.innerHTML = '';
+      chartContainer.appendChild(canvas);
+
       const data = CaloriesChart.prepareChartData(stats);
-      const ctx = document.getElementById("caloriesChart");
-      if (ctx) {
-        CaloriesChart.instance = new Chart(ctx, CaloriesChart.createChartConfig(data));
-      }
+      CaloriesChart.instance = new Chart(canvas, CaloriesChart.createChartConfig(data));
     }
 
-    // Update rates display regardless of history
     RatesDisplay.update(stats);
   } catch (error) {
     console.error('Error initializing chart and rates:', error);
