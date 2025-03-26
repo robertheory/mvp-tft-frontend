@@ -195,45 +195,71 @@ const CaloriesChart = {
   },
 
   /**
-   * Updates chart data and display
+   * Shows a message when there's no data
    */
-  async update() {
-    const stats = await StatsService.loadStats();
-    const data = this.prepareChartData(stats);
-
-    RatesDisplay.update(stats);
-
-    if (this.instance) {
-      this.instance.data.labels = data.labels;
-      this.instance.data.datasets[0].data = data.calories;
-      this.instance.data.datasets[1].data = data.limit;
-      this.instance.update();
-    }
-  },
-
-  /**
-   * Initializes the chart
-   */
-  async init() {
-    const stats = await StatsService.loadStats();
-    const data = this.prepareChartData(stats);
-
-    RatesDisplay.update(stats);
-
+  showNoDataMessage() {
     const ctx = document.getElementById("caloriesChart");
     if (!ctx) return;
 
-    this.instance = new Chart(ctx, this.createChartConfig(data));
+    ctx.innerHTML = `
+      <div class="text-center p-4">
+        <p class="text-muted mb-0">
+          <i class="bi bi-info-circle me-2"></i>
+          Sem refeições recentes - adicione refeições para visualizar mais dados
+        </p>
+      </div>
+    `;
   }
 };
 
-window.updateCaloriesChart = () => {
-  setTimeout(() => CaloriesChart.update(), 500);
+window.updateCaloriesChart = async () => {
+  setTimeout(async () => {
+    try {
+      const stats = await StatsService.loadStats();
+
+      // Check if history is empty or undefined
+      if (!stats.history || stats.history.length === 0) {
+        CaloriesChart.showNoDataMessage();
+      } else {
+        const data = CaloriesChart.prepareChartData(stats);
+        if (CaloriesChart.instance) {
+          CaloriesChart.instance.data.labels = data.labels;
+          CaloriesChart.instance.data.datasets[0].data = data.calories;
+          CaloriesChart.instance.data.datasets[1].data = data.limit;
+          CaloriesChart.instance.update();
+        }
+      }
+
+      // Update rates display regardless of history
+      RatesDisplay.update(stats);
+    } catch (error) {
+      console.error('Error updating chart and rates:', error);
+      RatesDisplay.update({ bmr: 0, tdee: 0 });
+      CaloriesChart.showNoDataMessage();
+    }
+  }, 500);
 };
 
-window.updateRates = async () => {
-  const stats = await StatsService.loadStats();
-  RatesDisplay.update(stats);
-};
+window.initCaloriesChart = async () => {
+  try {
+    const stats = await StatsService.loadStats();
 
-document.addEventListener("DOMContentLoaded", () => CaloriesChart.init());
+    // Check if history is empty or undefined
+    if (!stats.history || stats.history.length === 0) {
+      CaloriesChart.showNoDataMessage();
+    } else {
+      const data = CaloriesChart.prepareChartData(stats);
+      const ctx = document.getElementById("caloriesChart");
+      if (ctx) {
+        CaloriesChart.instance = new Chart(ctx, CaloriesChart.createChartConfig(data));
+      }
+    }
+
+    // Update rates display regardless of history
+    RatesDisplay.update(stats);
+  } catch (error) {
+    console.error('Error initializing chart and rates:', error);
+    RatesDisplay.update({ bmr: 0, tdee: 0 });
+    CaloriesChart.showNoDataMessage();
+  }
+};

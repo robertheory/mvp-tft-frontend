@@ -491,7 +491,23 @@ const PersonalInfoHandler = {
     ]);
 
     const currentInfo = await DataService.loadCurrentPersonalInfo();
-    if (currentInfo) {
+
+
+    if (!currentInfo) {
+      const profileModal = document.getElementById('profileModal');
+      const modal = new bootstrap.Modal(profileModal);
+
+      const closeButton = profileModal.querySelector('.btn-close');
+      const closeFooterButton = profileModal.querySelector('.btn-secondary[data-bs-dismiss="modal"]');
+      if (closeButton) closeButton.remove();
+      if (closeFooterButton) closeFooterButton.remove();
+
+      profileModal.setAttribute('data-bs-backdrop', 'static');
+      profileModal.setAttribute('data-bs-keyboard', 'false');
+
+      modal.show();
+    } else {
+      // Populate form with current info
       form.elements['age'].value = currentInfo.age;
       form.elements['gender'].value = currentInfo.gender;
       form.elements['weight'].value = currentInfo.weight;
@@ -520,14 +536,18 @@ const PersonalInfoHandler = {
         });
 
         if (response.ok) {
-          UI.showToast('Personal information updated successfully!', 'success');
-          window.updateRates();
+          UI.showToast('Informações pessoais atualizadas com sucesso!', 'success');
           window.updateCaloriesChart();
+
+          const profileModal = document.getElementById('profileModal');
+          if (profileModal.querySelector('.btn-close') || profileModal.querySelector('.btn-secondary[data-bs-dismiss="modal"]')) {
+            state.modals.profile.hide();
+          }
         } else {
-          UI.showToast('Error updating personal information. Please try again.', 'danger');
+          UI.showToast('Erro ao atualizar informações pessoais. Por favor, tente novamente.', 'danger');
         }
       } catch (error) {
-        UI.showToast('Error updating personal information. Please try again.', 'danger');
+        UI.showToast('Erro ao atualizar informações pessoais. Por favor, tente novamente.', 'danger');
       }
     });
   }
@@ -539,8 +559,8 @@ const initApp = async () => {
   await DataService.loadFoods();
   await MealHandler.loadAndRenderMeals();
   await PersonalInfoHandler.setupPersonalInfoForm();
+  await window.initCaloriesChart();
 
-  // Initialize modals
   state.modals = {
     profile: new bootstrap.Modal(document.getElementById("profileModal")),
     meal: new bootstrap.Modal(document.getElementById("mealModal")),
@@ -567,14 +587,6 @@ const initApp = async () => {
     editMealForm.addEventListener('submit', (e) => {
       MealHandler.submitEditMeal(e);
       state.modals.editMeal.hide();
-    });
-  }
-
-  const personalInfoForm = document.getElementById('personal-info-form');
-  if (personalInfoForm) {
-    personalInfoForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      state.modals.profile.hide();
     });
   }
 
