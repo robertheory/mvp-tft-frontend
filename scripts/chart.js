@@ -66,11 +66,14 @@ const DateFormatter = {
    * @returns {string} Formatted date (e.g., "DOM 07/04")
    */
   formatDateWithWeekDay(dateStr) {
-    const date = new Date(dateStr);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    // Parse the date string and adjust for timezone
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
 
-    return `${ChartConfig.weekDays[date.getDay()]} ${day}/${month}`;
+    const dayStr = date.getDate().toString().padStart(2, '0');
+    const monthStr = (date.getMonth() + 1).toString().padStart(2, '0');
+
+    return `${ChartConfig.weekDays[date.getDay()]} ${dayStr}/${monthStr}`;
   }
 };
 
