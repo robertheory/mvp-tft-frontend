@@ -12,7 +12,7 @@ Descrição completa disponível em [docs/specs.md](docs/specs.md).
 
 ### Pré-requisitos
 
-Para ter uma experiência completa com o TFT, é necessário ter o backend da aplicação rodando. Para isso, siga as instruções disponíveis no repositório do [backend](https://github.com/robertheory/mvp-tft-backend).
+Para ter uma experiência completa com o TFT, é necessário que o backend da aplicação esteja sendo executado. Para isso, siga as instruções disponíveis no repositório do [backend](https://github.com/robertheory/mvp-tft-backend).
 
 Após a devida configuração do backend, siga os passos abaixo para rodar o frontend:
 
