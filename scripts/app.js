@@ -266,15 +266,15 @@ const MealHandler = {
       });
 
       if (response.ok) {
-        UI.showToast('Meal updated successfully!', 'success');
+        UI.showToast('Refeição atualizada com sucesso!', 'success');
         await this.loadAndRenderMeals();
         state.modals.editMeal.hide();
         window.updateCaloriesChart();
       } else {
-        UI.showToast('Error updating meal. Please try again.', 'danger');
+        UI.showToast('Erro ao atualizar refeição. Por favor, tente novamente.', 'danger');
       }
     } catch (error) {
-      UI.showToast('Error updating meal. Please try again.', 'danger');
+      UI.showToast('Erro ao atualizar refeição. Por favor, tente novamente.', 'danger');
     }
   },
 
@@ -296,15 +296,15 @@ const MealHandler = {
       });
 
       if (response.ok) {
-        UI.showToast('Meal created successfully!', 'success');
+        UI.showToast('Refeição criada com sucesso!', 'success');
         await this.loadAndRenderMeals();
         e.target.reset();
         window.updateCaloriesChart();
       } else {
-        UI.showToast('Error creating meal. Please try again.', 'danger');
+        UI.showToast('Erro ao criar refeição. Por favor, tente novamente.', 'danger');
       }
     } catch (error) {
-      UI.showToast('Error creating meal. Please try again.', 'danger');
+      UI.showToast('Erro ao criar refeição. Por favor, tente novamente.', 'danger');
     }
   },
 
@@ -315,14 +315,14 @@ const MealHandler = {
       });
 
       if (response.ok) {
-        UI.showToast('Meal deleted successfully!', 'success');
+        UI.showToast('Refeição excluída com sucesso!', 'success');
         await this.loadAndRenderMeals();
         window.updateCaloriesChart();
       } else {
-        UI.showToast('Error deleting meal. Please try again.', 'danger');
+        UI.showToast('Erro ao excluir refeição. Por favor, tente novamente.', 'danger');
       }
     } catch (error) {
-      UI.showToast('Error deleting meal. Please try again.', 'danger');
+      UI.showToast('Erro ao excluir refeição. Por favor, tente novamente.', 'danger');
     }
   },
 
